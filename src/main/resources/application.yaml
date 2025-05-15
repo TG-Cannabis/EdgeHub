@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: EdgeHub
+
+server:
+  port: 8085
