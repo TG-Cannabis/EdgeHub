@@ -60,6 +60,12 @@
 			<artifactId>spring-integration-mqtt</artifactId>
 			<version>6.4.4</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.influxdb</groupId>
+			<artifactId>influxdb-client-java</artifactId>
+			<version>7.1.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

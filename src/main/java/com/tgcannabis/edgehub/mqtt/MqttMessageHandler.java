@@ -20,7 +20,7 @@ public class MqttMessageHandler {
     public void handleMessage(Message<?> message) {
         String topic = (String) message.getHeaders().get("mqtt_receivedTopic");
         String payload = message.getPayload().toString();
-        logger.info("Received MQTT message: " + topic + " -> " + payload);
+        logger.info("Received MQTT message: {} -> {}", topic, payload);
 
         broadcaster.broadcast(topic, payload);
     }

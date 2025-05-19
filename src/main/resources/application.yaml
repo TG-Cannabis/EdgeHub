@@ -3,9 +3,15 @@ spring:
     name: EdgeHub
 
 server:
-  port: 8085
+  port: 8088
 
 mqtt:
   broker: tcp://localhost:1883
   client-id: edge-hub-client
-  topics: sensor-data/#,alerts
+  topics: sensors/#,alerts
+
+influx:
+  bucket: sensor_data
+
+sensor:
+  duration: 60
