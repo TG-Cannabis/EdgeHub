@@ -1,0 +1,10 @@
+influx:
+  bucket: test-bucket
+  url: http://localhost:8086
+  token: dummy-token
+  org: dummy-org
+sensor:
+  duration: '5'
+
+mqtt:
+  enabled: false
