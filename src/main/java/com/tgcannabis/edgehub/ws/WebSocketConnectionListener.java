@@ -32,6 +32,10 @@ public class WebSocketConnectionListener {
 
     @EventListener
     public void handleSessionSubscribe(SessionSubscribeEvent event) {
+        String newDestination = (String) event.getMessage().getHeaders().get("simpDestination");
+        if (!"/topic/sensors/data".equals(newDestination))
+            return;
+
         String destination = "/topic/sensors/data";
         List<FluxTable> tables = getFluxTables();
 
@@ -58,7 +62,9 @@ public class WebSocketConnectionListener {
 
     @NotNull
     private List<FluxTable> getFluxTables() {
-        String flux = String.format("""
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        String recentFlux = String.format("""
                     from(bucket: "%s")
                       |> range(start: -%dm)
                       |> filter(fn: (r) => r._measurement != "")
@@ -66,8 +72,26 @@ public class WebSocketConnectionListener {
                       |> sort(columns: ["_time"])
                 """, bucket, durationMinutes);
 
-        QueryApi queryApi = influxDBClient.getQueryApi();
-        return queryApi.query(flux);
+        List<FluxTable> recentTables = queryApi.query(recentFlux);
+
+        int totalRecords = recentTables.stream()
+                .mapToInt(t -> t.getRecords().size())
+                .sum();
+
+        if (totalRecords >= 50) {
+            return recentTables;
+        }
+
+        String fullFlux = String.format("""
+                    from(bucket: "%s")
+                      |> range(start: 0)
+                      |> filter(fn: (r) => r._measurement != "")
+                      |> filter(fn: (r) => r.location == "greenhouse1")
+                      |> pivot(rowKey:["_time"], columnKey: ["_field"], valueColumn: "_value")
+                      |> sort(columns: ["_time"])
+                """, bucket);
+
+        return queryApi.query(fullFlux);
     }
 
 }
